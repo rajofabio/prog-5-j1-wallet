@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-run:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,22 +20,8 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Compile Wallet project
-        run: |
-          mkdir -p target/classes
-          javac -d target/classes src/main/java/org/example/Wallet.java src/main/java/org/example/Main.java
+      - name: Build project with Maven
+        run: mvn clean compile
 
-      - name: Compile Wallet tests
-        run: |
-          mkdir -p target/test-classes
-          javac -d target/test-classes -cp target/classes:libs/junit-platform-console-standalone-1.10.2.jar src/test/java/org/example/WalletTest.java
-
-      - name: Run Main
-        run: |
-          java -cp target/classes org.example.Main
-
-      - name: Run Wallet tests
-        run: |
-          java -jar libs/junit-platform-console-standalone-1.10.2.jar \
-            -cp target/classes:target/test-classes \
-            --scan-classpath
+      - name: Run tests with Maven
+        run: mvn test
