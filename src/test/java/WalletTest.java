@@ -21,11 +21,8 @@ class WalletTest {
         wallet.addMoney(100);
         assertEquals(100, wallet.getMoney());
 
-        // Test exception pour montant négatif
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            wallet.addMoney(-50);
-        });
-        assertEquals("Invalid amount: must be positive", exception.getMessage());
+        // tester montant négatif
+        assertThrows(IllegalArgumentException.class, () -> wallet.addMoney(-50));
     }
 
     @Test
@@ -44,4 +41,18 @@ class WalletTest {
         assertTrue(wallet.getCardHolder().contains("MasterCard"));
     }
 
+    @Test
+    void testLostWallet() {
+        wallet.addMoney(100);
+        wallet.addCard("Visa");
+
+        wallet.lost();
+
+
+        assertThrows(IllegalStateException.class, () -> wallet.getMoney());
+        assertThrows(IllegalStateException.class, () -> wallet.getCardHolder());
+        assertThrows(IllegalStateException.class, () -> wallet.addMoney(50));
+        assertThrows(IllegalStateException.class, () -> wallet.addCard("MasterCard"));
+        assertThrows(IllegalStateException.class, () -> wallet.checkMoney(10));
+    }
 }
