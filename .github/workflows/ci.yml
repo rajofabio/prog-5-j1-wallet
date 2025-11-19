@@ -1,0 +1,41 @@
+name: Wallet CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compile Wallet project
+        run: |
+          mkdir -p target/classes
+          javac -d target/classes src/main/java/org/example/Wallet.java src/main/java/org/example/Main.java
+
+      - name: Compile Wallet tests
+        run: |
+          mkdir -p target/test-classes
+          javac -d target/test-classes -cp target/classes:libs/junit-platform-console-standalone-1.10.2.jar src/test/java/org/example/WalletTest.java
+
+      - name: Run Main
+        run: |
+          java -cp target/classes org.example.Main
+
+      - name: Run Wallet tests
+        run: |
+          java -jar libs/junit-platform-console-standalone-1.10.2.jar \
+            -cp target/classes:target/test-classes \
+            --scan-classpath
